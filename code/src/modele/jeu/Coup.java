@@ -3,10 +3,20 @@ package modele.jeu;
 import modele.plateau.Case;
 
 public class Coup {
-    protected Case dep;
-    protected Case arr;
-    public Coup(Case _dep, Case _arr) {
-        dep = _dep;
-        arr = _arr;
+    private Case dep;
+    private Case arr;
+
+    public Coup(Case dep, Case arr) {
+        this.dep = dep;
+        this.arr = arr;
+    }
+    
+    public Case getDep() {
+        return dep;
+    }
+    
+    public Case getArr() {
+        return arr;
     }
 }
+

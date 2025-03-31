@@ -130,44 +130,44 @@ public class VueControleur extends JFrame implements Observer {
      * Il y a une grille du côté du modèle ( jeu.getGrille() ) et une grille du côté de la vue (tabJLabel)
      */
     private void mettreAJourAffichage() {
-
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
 
                 Case c = plateau.getCases()[x][y];
-
+    
                 if (c != null) {
 
                     Piece e = c.getPiece();
-
-                    if (e!= null) {
+                    System.out.println("Case (" + x + ", " + y + "): " + e);
+    
+                    if (e != null) {
                         if (c.getPiece() instanceof Roi) {
 
                             tabJLabel[x][y].setIcon(icoRoi);
+                            System.out.println("Placing Roi at (" + x + ", " + y + ")");
 
                         }
                     } else {
                         tabJLabel[x][y].setIcon(null);
-
                     }
-
-
                 }
-
+                //tabJLabel[x][y].revalidate();
+                //tabJLabel[x][y].repaint();
             }
         }
     }
+    
 
     @Override
     public void update(Observable o, Object arg) {
         mettreAJourAffichage();
-        /*
+        
 
         // récupérer le processus graphique pour rafraichir
         // (normalement, à l'inverse, a l'appel du modèle depuis le contrôleur, utiliser un autre processus, voir classe Executor)
 
 
-        SwingUtilities.invokeLater(new Runnable() {
+        /*SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         mettreAJourAffichage();

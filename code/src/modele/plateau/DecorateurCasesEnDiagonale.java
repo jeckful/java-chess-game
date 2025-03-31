@@ -9,7 +9,10 @@ public class DecorateurCasesEnDiagonale extends DecorateurCasesAccessibles {
     }
 
     public ArrayList<Case> getMesCasesAccessibles() {
-        // TODO
-        return null;
+        ArrayList<Case> casesDiagonale = new ArrayList<>();
+        // Logique pour récupérer les cases accessibles en diagonale
+        // Ajouter les cases accessibles en diagonale
+        return casesDiagonale;
     }
 }
+
