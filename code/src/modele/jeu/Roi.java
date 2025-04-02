@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package modele.jeu;
 
 import modele.plateau.*;
@@ -10,11 +5,10 @@ import modele.plateau.*;
 import java.util.ArrayList;
 
 public class Roi extends Piece {
+    private DecorateurCasesAccessibles casesAccessibles;
 
-    public Roi(Plateau _plateau) {
-        super(_plateau);  // Pass Plateau to Piece constructor
-
-        // Decorate accessible cases for the King (in lines and diagonals)
+    public Roi(Case _c, Joueur _joueur) {
+        super(_c, _joueur);  // Call the Piece constructor with the case and joueur
         casesAccessibles = new DecorateurCasesEnLigne(new DecorateurCasesEnDiagonale(null));
     }
 
@@ -22,16 +16,17 @@ public class Roi extends Piece {
     public ArrayList<Case> calculerDeplacementsPossibles() {
         ArrayList<Case> deplacements = new ArrayList<>();
         
-        // Les déplacements du roi (une case dans chaque direction)
-        Direction[] directions = Direction.values();
-        for (Direction dir : directions) {
-            // Calcul des cases accessibles en fonction de la direction
-            Case cAccess = plateau.caseDansDirection(c, dir);
-            if (cAccess != null) {
-                deplacements.add(cAccess);
+        // Utiliser la méthode getCasesAccessibles() pour récupérer les cases accessibles
+        ArrayList<Case> cases = casesAccessibles.getCasesAccessibles();
+        
+        for (Case caseCible : cases) {
+            // Vous pouvez ajouter la logique pour valider si une case est réellement accessible pour le roi
+            // Par exemple : ne pas aller sur une case occupée par une pièce du même joueur
+            if (caseCible != null && (caseCible.getPiece() == null || caseCible.getPiece().getJoueur() != this.joueur)) {
+                deplacements.add(caseCible);
             }
         }
+        
         return deplacements;
     }
 }
-

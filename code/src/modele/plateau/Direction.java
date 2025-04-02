@@ -10,5 +10,7 @@ package modele.plateau;
  *
  */
 public enum Direction {
-    haut, bas, gauche, droite
+    HAUT, BAS, GAUCHE, DROITE,
+    HAUT_GAUCHE, HAUT_DROITE,
+    BAS_GAUCHE, BAS_DROITE;
 }

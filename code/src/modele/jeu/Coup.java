@@ -18,5 +18,9 @@ public class Coup {
     public Case getArr() {
         return arr;
     }
+
+    public Piece getPiece() {
+        return dep.getPiece();
+    }
 }
 

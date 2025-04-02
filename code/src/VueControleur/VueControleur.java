@@ -4,32 +4,39 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.*;
-
-
+import java.beans.PropertyChangeListener;
 import modele.jeu.Coup;
 import modele.jeu.Jeu;
 import modele.plateau.Case;
+import modele.plateau.Couleur;
 import modele.jeu.Piece;
 import modele.jeu.Roi;
+import modele.jeu.Pion;
+import modele.jeu.Reine;
+import modele.jeu.Tour;
+import modele.jeu.Cavalier;
+import modele.jeu.Fou;
 import modele.plateau.Plateau;
-
 
 /** Cette classe a deux fonctions :
  *  (1) Vue : proposer une représentation graphique de l'application (cases graphiques, etc.)
  *  (2) Controleur : écouter les évènements clavier et déclencher le traitement adapté sur le modèle (clic position départ -> position arrivée pièce))
  *
  */
-public class VueControleur extends JFrame implements Observer {
+public class VueControleur extends JFrame {
     private Plateau plateau; // référence sur une classe de modèle : permet d'accéder aux données du modèle pour le rafraichissement, permet de communiquer les actions clavier (ou souris)
     private Jeu jeu;
     private final int sizeX; // taille de la grille affichée
     private final int sizeY;
     private static final int pxCase = 50; // nombre de pixel par case
     // icones affichées dans la grille
-    private ImageIcon icoRoi;
+    private ImageIcon icoRoiBlanc, icoRoiNoir;
+    private ImageIcon icoPionBlanc, icoPionNoir;
+    private ImageIcon icoReineBlanc, icoReineNoir;
+    private ImageIcon icoTourBlanc, icoTourNoir;
+    private ImageIcon icoCavalierBlanc, icoCavalierNoir;
+    private ImageIcon icoFouBlanc, icoFouNoir;
 
     private Case caseClic1; // mémorisation des cases cliquées
     private Case caseClic2;
@@ -44,44 +51,51 @@ public class VueControleur extends JFrame implements Observer {
         sizeX = plateau.SIZE_X;
         sizeY = plateau.SIZE_Y;
 
-
-
         chargerLesIcones();
         placerLesComposantsGraphiques();
 
-        plateau.addObserver(this);
+        plateau.addPropertyChangeListener(evt -> mettreAJourAffichage());
 
         mettreAJourAffichage();
-
     }
 
 
     private void chargerLesIcones() {
-        icoRoi = chargerIcone("Images/wK.png");
-
-
+        icoRoiBlanc = chargerIcone("Images/wK.png");
+        icoRoiNoir = chargerIcone("Images/bK.png");
+        icoPionBlanc = chargerIcone("Images/wP.png");
+        icoPionNoir = chargerIcone("Images/bP.png");
+        icoReineBlanc = chargerIcone("Images/wQ.png");
+        icoReineNoir = chargerIcone("Images/bQ.png");
+        icoTourBlanc = chargerIcone("Images/wR.png");
+        icoTourNoir = chargerIcone("Images/bR.png");
+        icoCavalierBlanc = chargerIcone("Images/wN.png");
+        icoCavalierNoir = chargerIcone("Images/bN.png");
+        icoFouBlanc = chargerIcone("Images/wB.png");
+        icoFouNoir = chargerIcone("Images/bB.png");
     }
 
     private ImageIcon chargerIcone(String urlIcone) {
-        BufferedImage image = null;
-
-        ImageIcon icon = new ImageIcon(urlIcone);
-
-        // Redimensionner l'icône
-        Image img = icon.getImage().getScaledInstance(pxCase, pxCase, Image.SCALE_SMOOTH);
-        ImageIcon resizedIcon = new ImageIcon(img);
-
-        return resizedIcon;
+        java.net.URL imgURL = getClass().getResource("/" + urlIcone);
+        if (imgURL != null) {
+            ImageIcon icon = new ImageIcon(imgURL);
+            // Redimensionner l'icône
+            Image img = icon.getImage().getScaledInstance(pxCase, pxCase, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        } else {
+            System.err.println("Impossible de charger l'image: " + urlIcone);
+            return null;
+        }
     }
+    
 
     private void placerLesComposantsGraphiques() {
         setTitle("Jeu d'Échecs");
         setResizable(false);
-        setSize(sizeX * pxCase, sizeX * pxCase);
+        setSize(sizeX * pxCase, sizeY * pxCase);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // permet de terminer l'application à la fermeture de la fenêtre
 
         JComponent grilleJLabels = new JPanel(new GridLayout(sizeY, sizeX)); // grilleJLabels va contenir les cases graphiques et les positionner sous la forme d'une grille
-
 
         tabJLabel = new JLabel[sizeX][sizeY];
 
@@ -113,7 +127,7 @@ public class VueControleur extends JFrame implements Observer {
 
                 jlab.setOpaque(true);
 
-                if ((y%2 == 0 && x%2 == 0) || (y%2 != 0 && x%2 != 0)) {
+                if ((y % 2 == 0 && x % 2 == 0) || (y % 2 != 0 && x % 2 != 0)) {
                     tabJLabel[x][y].setBackground(new Color(50, 50, 110));
                 } else {
                     tabJLabel[x][y].setBackground(new Color(150, 150, 210));
@@ -141,39 +155,49 @@ public class VueControleur extends JFrame implements Observer {
                     System.out.println("Case (" + x + ", " + y + "): " + e);
     
                     if (e != null) {
-                        if (c.getPiece() instanceof Roi) {
-
-                            tabJLabel[x][y].setIcon(icoRoi);
-                            System.out.println("Placing Roi at (" + x + ", " + y + ")");
-
+                        // Check the color of the piece and assign the appropriate icon
+                        if (e instanceof Roi) {
+                            if (e.getCouleur() == Couleur.BLANC) {
+                                tabJLabel[x][y].setIcon(icoRoiBlanc);
+                            } else {
+                                tabJLabel[x][y].setIcon(icoRoiNoir);
+                            }
+                        } else if (e instanceof Pion) {
+                            if (e.getCouleur() == Couleur.BLANC) {
+                                tabJLabel[x][y].setIcon(icoPionBlanc);
+                            } else {
+                                tabJLabel[x][y].setIcon(icoPionNoir);
+                            }
+                        } else if (e instanceof Reine) {
+                            if (e.getCouleur() == Couleur.BLANC) {
+                                tabJLabel[x][y].setIcon(icoReineBlanc);
+                            } else {
+                                tabJLabel[x][y].setIcon(icoReineNoir);
+                            }
+                        } else if (e instanceof Tour) {
+                            if (e.getCouleur() == Couleur.BLANC) {
+                                tabJLabel[x][y].setIcon(icoTourBlanc);
+                            } else {
+                                tabJLabel[x][y].setIcon(icoTourNoir);
+                            }
+                        } else if (e instanceof Cavalier) {
+                            if (e.getCouleur() == Couleur.BLANC) {
+                                tabJLabel[x][y].setIcon(icoCavalierBlanc);
+                            } else {
+                                tabJLabel[x][y].setIcon(icoCavalierNoir);
+                            }
+                        } else if (e instanceof Fou) {
+                            if (e.getCouleur() == Couleur.BLANC) {
+                                tabJLabel[x][y].setIcon(icoFouBlanc);
+                            } else {
+                                tabJLabel[x][y].setIcon(icoFouNoir);
+                            }
                         }
                     } else {
                         tabJLabel[x][y].setIcon(null);
                     }
                 }
-                //tabJLabel[x][y].revalidate();
-                //tabJLabel[x][y].repaint();
             }
         }
-    }
-    
-
-    @Override
-    public void update(Observable o, Object arg) {
-        mettreAJourAffichage();
-        
-
-        // récupérer le processus graphique pour rafraichir
-        // (normalement, à l'inverse, a l'appel du modèle depuis le contrôleur, utiliser un autre processus, voir classe Executor)
-
-
-        /*SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        mettreAJourAffichage();
-                    }
-                }); 
-        */
-
     }
 }

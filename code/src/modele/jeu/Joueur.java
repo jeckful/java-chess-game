@@ -2,18 +2,37 @@ package modele.jeu;
 
 import java.util.ArrayList;
 import modele.plateau.Case;
+import modele.plateau.Couleur;
 import modele.plateau.Plateau;
 
 public class Joueur {
     private Jeu jeu;
     private ArrayList<Piece> pieces;
     private Roi roi;
+    private boolean estTourActuel;
+    private boolean isBlanc;
+    private Couleur couleur;
 
-    public Joueur(Jeu _jeu) {
-        jeu = _jeu;
-        pieces = new ArrayList<>();
-        roi = new Roi(jeu.getPlateau()); // Ensure Roi is initialized with the Plateau
-        pieces.add(roi);  // Add the king to the player's pieces
+
+
+    public Joueur(Jeu _jeu, boolean isBlanc) {
+        this.jeu = _jeu;
+        this.isBlanc = isBlanc;
+        this.couleur = this.isBlanc ? Couleur.BLANC : Couleur.NOIR;
+        this.estTourActuel = this.isBlanc;
+        this.pieces = new ArrayList<>();
+    }
+
+    public boolean estBlanc() {
+        return isBlanc;
+    }
+
+    public Joueur getAdversaire() {
+        return estBlanc() ? jeu.getJ2() : jeu.getJ1();
+    }
+
+    public Couleur getCouleur() {
+        return couleur;
     }
 
     public ArrayList<Coup> getCoupsValides() {
@@ -23,8 +42,8 @@ public class Joueur {
             ArrayList<Case> coupsPossibles = piece.calculerDeplacementsPossibles();
             
             for (Case caseCible : coupsPossibles) {
-                Coup coup = new Coup(piece.getCase(), caseCible);  // Create a Coup object for each move
-                if (isCoupValide(piece, caseCible)) {
+                Coup coup = new Coup(piece.getPosition(), caseCible);  // Create a Coup object for each move
+                if (isCoupValide(coup)) {
                     coupsValides.add(coup);
                 }
             }
@@ -33,53 +52,26 @@ public class Joueur {
         return coupsValides;
     }
 
-    private boolean isCoupValide(Piece piece, Case caseCible) {
-        if (caseCible.getPiece() == null || !caseCible.getPiece().getClass().equals(piece.getClass())) {
-            return !estRoiEnEchec(piece, caseCible);  // Ensure the king is not in check after the move
-        }
-        return false;
-    }
-
-    private boolean estRoiEnEchec(Piece piece, Case caseCible) {
+    private boolean isCoupValide(Coup coup) {
         Plateau plateau = jeu.getPlateau();
-        Case caseOrigine = piece.getCase();
-
-        piece.allerSurCase(caseCible);
-
-        boolean roiEnEchec = false;
-        for (Piece p : pieces) {
-            if (p instanceof Roi) {
-                roiEnEchec = isRoiInCheck((Roi) p);
-                break;
-            }
-        }
-
-        piece.allerSurCase(caseOrigine);
-
-        return roiEnEchec;
-    }
-
-    private boolean isRoiInCheck(Roi roi) {
-        for (Piece p : jeu.getPlateau().getToutesLesPiecesAdverses(this)) {
-            if (p.peutAttaquer(roi.getCase())) {
-                return true;
-            }
-        }
-        return false;
+        return plateau.validerCoup(coup, this);
     }
 
     public Coup getCoup() {
-        synchronized (jeu) {
-            try {
-                jeu.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        synchronized (this) {
+            while (jeu.coupRecu == null || !estTourActuel) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
-        return jeu.coupRecu;
+        Coup coup = jeu.coupRecu;
+        jeu.coupRecu = null; // Réinitialiser le coup pour la prochaine attente
+        return coup;
     }
-
+    
     public Roi getRoi() {
         return roi;
     }
@@ -91,4 +83,39 @@ public class Joueur {
     public void setRoi(Roi roi) {
         this.roi = roi;
     }
+
+    public boolean estTourActuel() {
+        return estTourActuel;
+    }
+
+    public void setTourActuel(boolean estTourActuel) {
+        this.estTourActuel = estTourActuel;
+    }
+
+    public void initialiserPieces(Plateau plateau, boolean estBlanc) {
+        pieces.clear();
+        
+        int lignePions = estBlanc ? 6 : 1;
+        int lignePieces = estBlanc ? 7 : 0;
+    
+        // Ajouter les pions
+        for (int x = 0; x < Plateau.SIZE_X; x++) {
+            Piece pion = new Pion(plateau.getCases()[x][lignePions], this);
+            pieces.add(pion);
+        }
+    
+        // Ajouter les pièces majeures
+        pieces.add(new Tour(plateau.getCases()[0][lignePieces], this));
+        pieces.add(new Tour(plateau.getCases()[7][lignePieces], this));
+        pieces.add(new Cavalier(plateau.getCases()[1][lignePieces], this));
+        pieces.add(new Cavalier(plateau.getCases()[6][lignePieces], this));
+        pieces.add(new Fou(plateau.getCases()[2][lignePieces], this));
+        pieces.add(new Fou(plateau.getCases()[5][lignePieces], this));
+        pieces.add(new Reine(plateau.getCases()[3][lignePieces], this));
+        
+        // Ajouter le Roi
+        roi = new Roi(plateau.getCases()[4][lignePieces], this);
+        pieces.add(roi);
+    }
+    
 }
