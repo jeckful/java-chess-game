@@ -10,6 +10,7 @@ public abstract class Piece {
     protected Case position;
     protected Joueur joueur;
     protected Plateau plateau;
+    public String nom;
 
     public Piece(Case position, Joueur joueur) {
         this.joueur = joueur;
@@ -21,6 +22,10 @@ public abstract class Piece {
 
     public Joueur getJoueur() {
         return joueur;
+    }
+
+    public String getNom() {
+        return nom;
     }
 
     public Case getPosition() {

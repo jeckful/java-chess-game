@@ -111,17 +111,45 @@ public class VueControleur extends JFrame {
                 jlab.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-
+                        JLabel caseCliquee = (JLabel) e.getSource();
+                        int x = -1, y = -1;
+                        
+                        // Recherche de la case cliquée
+                        for (int i = 0; i < sizeX; i++) {
+                            for (int j = 0; j < sizeY; j++) {
+                                if (tabJLabel[i][j] == caseCliquee) {
+                                    x = i;
+                                    y = j;
+                                }
+                            }
+                        }
+                    
+                        if (x == -1 || y == -1) {
+                            System.out.println("Erreur : case non trouvée.");
+                            return;
+                        }
+                    
+                        System.out.println("Case cliquée : (" + x + ", " + y + ")");
+                    
+                        Case caseSelectionnee = plateau.getCases()[x][y];
+                    
                         if (caseClic1 == null) {
-                            caseClic1 = plateau.getCases()[xx][yy];
+                            caseClic1 = caseSelectionnee;
+                            System.out.println("Première case sélectionnée.");
                         } else {
-                            caseClic2 = plateau.getCases()[xx][yy];
-                            jeu.envoyerCoup(new Coup(caseClic1, caseClic2));
+                            caseClic2 = caseSelectionnee;
+                            System.out.println("Deuxième case sélectionnée.");
+                    
+                            Coup coup = new Coup(caseClic1, caseClic2);
+                            //System.out.println("Tentative de déplacement : " + caseClic1 + " -> " + caseClic2);
+                            jeu.appliquerCoup(coup);
+                            mettreAJourAffichage();
+                    
                             caseClic1 = null;
                             caseClic2 = null;
                         }
-
                     }
+                    
                 });
 
 
@@ -152,7 +180,7 @@ public class VueControleur extends JFrame {
                 if (c != null) {
 
                     Piece e = c.getPiece();
-                    System.out.println("Case (" + x + ", " + y + "): " + e);
+                    //System.out.println("Case (" + x + ", " + y + "): " + e);
     
                     if (e != null) {
                         // Check the color of the piece and assign the appropriate icon

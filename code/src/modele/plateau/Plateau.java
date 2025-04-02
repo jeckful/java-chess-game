@@ -34,7 +34,6 @@ public class Plateau {
     public Plateau(Joueur j1, Joueur j2) {
         this.j1 = j1;
         this.j2 = j2;
-        this.joueurActuel = j1;
         initPlateauVide();
         placerPieces();
     }
@@ -65,53 +64,43 @@ public class Plateau {
         notifyChange();
     }
 
-    public void deplacerPiece(Case c1, Case c2) {
-        if (c1.p != null) {
-            Piece piece = c1.getPiece();
-            if (piece.calculerDeplacementsPossibles().contains(c2)) {
-                c1.quitterLaCase();
-                piece.allerSurCase(c2);
-                notifyChange();
-                changerTour();
-            }
+    public void deplacerPiece(Case dep, Case arr) {
+        if (dep == null || arr == null) {
+            System.out.println("Erreur : case de départ ou d'arrivée null");
+            return;
         }
-    }
-
-    private void changerTour() {
-        if (joueurActuel == j1) {
-            j1.setTourActuel(false);
-            j2.setTourActuel(true);
-            joueurActuel = j2;
-            synchronized (j2) {
-                j2.notify();
-            }
-        } else {
-            j2.setTourActuel(false);
-            j1.setTourActuel(true);
-            joueurActuel = j1;
-            synchronized (j1) {
-                j1.notify();
-            }
+        Piece piece = dep.getPiece();
+        if (piece == null) {
+            System.out.println("Erreur : aucune pièce à déplacer depuis (" + dep.getX() + ", " + dep.getY() + ")");
+            return;
         }
+        System.out.println("Déplacement de " + piece.getNom() + " de (" + dep.getX() + "," + dep.getY() + ") vers (" + +arr.getX() + "," + arr.getY() + ")");
+        arr.setPiece(piece);
+        dep.setPiece(null);
     }
-
+    
 
     public boolean validerCoup(Coup coup, Joueur joueur) {
-        Case dep = coup.getDep();
-        Case arr = coup.getArr();
-
-        if (dep == null || arr == null) {
-            return false; // Les cases doivent être valides
+        if (coup == null) {
+            System.out.println("Validation échouée : coup null");
+            return false;
         }
-
-        Piece piece = dep.getPiece();
-        if (piece == null || piece.getJoueur() != joueur) {
-            return false; // Il n'y a pas de pièce ou ce n'est pas celle du joueur
+        if (coup.getDep() == null || coup.getArr() == null) {
+            System.out.println("Validation échouée : case de départ ou d'arrivée null");
+            return false;
         }
-
-        return piece.calculerDeplacementsPossibles().contains(arr);
+        if (coup.getDep().getPiece() == null) {
+            System.out.println("Validation échouée : pas de pièce sur la case de départ (" + coup.getDep().getX() + ", " + coup.getDep().getY() + ")");
+            return false;
+        }
+        if (!coup.getDep().getPiece().getJoueur().equals(joueur)) {
+            System.out.println("Validation échouée : ce n'est pas le tour de ce joueur");
+            return false;
+        }
+        return true; // À modifier selon les règles du jeu
     }
-
+    
+    
     public ArrayList<Piece> getToutesLesPiecesAdverses(Joueur joueur) {
         Joueur adversaire = (joueur == j1) ? j2 : j1;
         return adversaire.getPieces();
@@ -161,6 +150,9 @@ public class Plateau {
         return enEchec;
     }
     
+    public Joueur getJoueurActuel() {
+        return joueurActuel;
+    }
     
     
 

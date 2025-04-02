@@ -12,15 +12,17 @@ public class Joueur {
     private boolean estTourActuel;
     private boolean isBlanc;
     private Couleur couleur;
+    private String nom;
 
 
 
-    public Joueur(Jeu _jeu, boolean isBlanc) {
+    public Joueur(Jeu _jeu, boolean isBlanc, String nom) {
         this.jeu = _jeu;
         this.isBlanc = isBlanc;
         this.couleur = this.isBlanc ? Couleur.BLANC : Couleur.NOIR;
         this.estTourActuel = this.isBlanc;
         this.pieces = new ArrayList<>();
+        this.nom = nom;
     }
 
     public boolean estBlanc() {
@@ -35,6 +37,10 @@ public class Joueur {
         return couleur;
     }
 
+    public String getNom() {
+        return nom;
+    }
+
     public ArrayList<Coup> getCoupsValides() {
         ArrayList<Coup> coupsValides = new ArrayList<>();
     
@@ -42,7 +48,7 @@ public class Joueur {
             ArrayList<Case> coupsPossibles = piece.calculerDeplacementsPossibles();
             
             for (Case caseCible : coupsPossibles) {
-                Coup coup = new Coup(piece.getPosition(), caseCible);  // Create a Coup object for each move
+                Coup coup = new Coup(piece.getPosition(), caseCible);
                 if (isCoupValide(coup)) {
                     coupsValides.add(coup);
                 }
@@ -58,6 +64,7 @@ public class Joueur {
     }
 
     public Coup getCoup() {
+        Coup coup;
         synchronized (this) {
             while (jeu.coupRecu == null || !estTourActuel) {
                 try {
@@ -66,11 +73,14 @@ public class Joueur {
                     e.printStackTrace();
                 }
             }
+            coup = jeu.coupRecu;
+            jeu.coupRecu = null;
+            changeTourActuel();
+            notifyAll();
         }
-        Coup coup = jeu.coupRecu;
-        jeu.coupRecu = null; // Réinitialiser le coup pour la prochaine attente
         return coup;
     }
+    
     
     public Roi getRoi() {
         return roi;
@@ -88,8 +98,8 @@ public class Joueur {
         return estTourActuel;
     }
 
-    public void setTourActuel(boolean estTourActuel) {
-        this.estTourActuel = estTourActuel;
+    public void changeTourActuel() {
+        this.estTourActuel = !this.estTourActuel;
     }
 
     public void initialiserPieces(Plateau plateau, boolean estBlanc) {

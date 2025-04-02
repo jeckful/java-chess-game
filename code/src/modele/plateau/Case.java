@@ -33,14 +33,6 @@ public class Case {
         }
     }
 
-    // Déplacer une pièce vers une autre case
-    public void deplacerPieceVers(Case destination) {
-        if (p != null) {
-            destination.setPiece(p);
-            quitterLaCase();
-        }
-    }
-
     // Méthode pour restaurer une pièce dans cette case
     public void restaurerPiece(Piece piece) {
         this.p = piece;

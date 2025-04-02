@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import modele.plateau.Case;
 
 public class Tour extends Piece {
+    public String nom = "Tour";
     public Tour(Case _c, Joueur _joueur) {
         super(_c, _joueur);
     }

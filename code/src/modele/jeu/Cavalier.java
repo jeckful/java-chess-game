@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import modele.plateau.Case;
 
 public class Cavalier extends Piece {
+    public String nom = "Cavalier";
+    
     public Cavalier(Case _c, Joueur _joueur) {
         super(_c, _joueur);
     }

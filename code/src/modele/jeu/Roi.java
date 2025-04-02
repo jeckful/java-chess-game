@@ -5,6 +5,7 @@ import modele.plateau.*;
 import java.util.ArrayList;
 
 public class Roi extends Piece {
+    public String nom = "Roi";
     private DecorateurCasesAccessibles casesAccessibles;
 
     public Roi(Case _c, Joueur _joueur) {

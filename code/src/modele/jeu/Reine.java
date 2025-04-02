@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import modele.plateau.Case;
 
 public class Reine extends Piece {
+    public String nom = "Reine";
     public Reine(Case _c, Joueur _joueur) {
         super(_c, _joueur);
     }

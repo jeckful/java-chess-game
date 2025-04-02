@@ -6,6 +6,7 @@ import modele.plateau.Plateau;
 
 public class Pion extends Piece {
     private boolean premierDeplacement = true;
+    public String nom = "Pion";
 
     public Pion(Case _c, Joueur _joueur) {
         super(_c, _joueur);
