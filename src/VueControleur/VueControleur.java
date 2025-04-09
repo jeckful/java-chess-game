@@ -30,7 +30,7 @@ public class VueControleur extends JFrame {
     private Jeu jeu;
     private final int sizeX; // taille de la grille affichée
     private final int sizeY;
-    private static final int pxCase = 50; // nombre de pixel par case
+    private int pxCase = 50; // nombre de pixel par case // modifié pour ne plus être "static final"
     // icones affichées dans la grille
     private ImageIcon icoRoiBlanc, icoRoiNoir;
     private ImageIcon icoPionBlanc, icoPionNoir;
@@ -58,6 +58,8 @@ public class VueControleur extends JFrame {
         plateau.addPropertyChangeListener(evt -> mettreAJourAffichage());
 
         mettreAJourAffichage();
+        ajouterBoutons();
+
     }
 
 
@@ -169,7 +171,48 @@ public class VueControleur extends JFrame {
         add(grilleJLabels);
     }
 
+    private void ajouterBoutons() {
+        JButton resetButton = new JButton("Reset");
+        resetButton.addActionListener(e -> {
+            jeu = new Jeu();
+            plateau = jeu.getPlateau();
+            plateau.addPropertyChangeListener(evt -> mettreAJourAffichage());
+            mettreAJourAffichage();
+        });
     
+        JButton zoomPlusButton = new JButton("Zoom +");
+        zoomPlusButton.addActionListener(e -> {
+            pxCase += 25; // augmente la taille de la case
+            chargerLesIcones();
+            resizeFenetre();      // adapte la taille de la fenêtre
+            revalidate();         // recalcul de la mise en page (Swing)
+            repaint();            // redessine la fenêtre
+            mettreAJourAffichage();
+        });
+
+        JButton zoomMoinsButton = new JButton("Zoom –");
+        zoomMoinsButton.addActionListener(e -> {
+            if (pxCase > 40) { // limite minimale pour éviter de tout casser
+                pxCase -= 25;
+                chargerLesIcones();
+                resizeFenetre();
+                revalidate();
+                repaint();
+                mettreAJourAffichage();
+            }
+        });
+    
+        JPanel panelBoutons = new JPanel();
+        panelBoutons.add(resetButton);
+        panelBoutons.add(zoomPlusButton);
+        panelBoutons.add(zoomMoinsButton);
+        this.add(panelBoutons, BorderLayout.SOUTH);
+    }
+    
+    private void resizeFenetre() {
+        setSize(sizeX * pxCase, sizeY * pxCase + 100); // +100 pour laisser la place aux boutons
+    }
+
     /**
      * Il y a une grille du côté du modèle ( jeu.getGrille() ) et une grille du côté de la vue (tabJLabel)
      */
