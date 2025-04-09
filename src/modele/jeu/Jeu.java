@@ -41,6 +41,15 @@ public class Jeu extends Thread {
         plateau.placerPieces();
     }
 
+    public void envoyerCoup(Coup c) {
+        coupRecu = c;
+
+        synchronized (this) {
+            notify();
+        }
+        System.out.println("hello");
+    }
+
     public void appliquerCoup(Coup coup) {
         // Vérification des erreurs
         if (coup == null) {

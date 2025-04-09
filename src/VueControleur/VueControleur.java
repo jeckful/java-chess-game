@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
+
 import modele.jeu.Coup;
 import modele.jeu.Jeu;
 import modele.plateau.Case;
@@ -140,15 +141,15 @@ public class VueControleur extends JFrame {
                         } else {
                             caseClic2 = caseSelectionnee;
                             System.out.println("Deuxième case sélectionnée.");
-                    
+                        
                             Coup coup = new Coup(caseClic1, caseClic2);
-                            //System.out.println("Tentative de déplacement : " + caseClic1 + " -> " + caseClic2);
-                            jeu.appliquerCoup(coup);
+                            jeu.envoyerCoup(coup);  // ✅ c’est la seule vraie modif importante
+                        
                             mettreAJourAffichage();
-                    
+                        
                             caseClic1 = null;
                             caseClic2 = null;
-                        }
+                        }                        
                     }
                     
                 });

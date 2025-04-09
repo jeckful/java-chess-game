@@ -9,7 +9,7 @@ public class Joueur {
     private Jeu jeu;
     private ArrayList<Piece> pieces;
     private Roi roi;
-    private boolean estTourActuel;
+/*  private boolean estTourActuel;*/
     private boolean isBlanc;
     private Couleur couleur;
     private String nom;
@@ -20,7 +20,7 @@ public class Joueur {
         this.jeu = _jeu;
         this.isBlanc = isBlanc;
         this.couleur = this.isBlanc ? Couleur.BLANC : Couleur.NOIR;
-        this.estTourActuel = this.isBlanc;
+/*      this.estTourActuel = this.isBlanc;*/
         this.pieces = new ArrayList<>();
         this.nom = nom;
     }
@@ -64,6 +64,19 @@ public class Joueur {
     }
 
     public Coup getCoup() {
+        synchronized (jeu) {
+            try {
+                jeu.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return jeu.coupRecu;
+    }
+    
+
+/* 
+    public Coup getCoup() {
         Coup coup;
         synchronized (this) {
             while (jeu.coupRecu == null || !estTourActuel) {
@@ -80,7 +93,7 @@ public class Joueur {
         }
         return coup;
     }
-    
+*/  
     
     public Roi getRoi() {
         return roi;
@@ -94,6 +107,7 @@ public class Joueur {
         this.roi = roi;
     }
 
+/*
     public boolean estTourActuel() {
         return estTourActuel;
     }
@@ -101,7 +115,7 @@ public class Joueur {
     public void changeTourActuel() {
         this.estTourActuel = !this.estTourActuel;
     }
-
+*/
     public void initialiserPieces(Plateau plateau, boolean estBlanc) {
         pieces.clear();
         
