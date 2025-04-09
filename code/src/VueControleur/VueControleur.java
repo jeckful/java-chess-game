@@ -61,22 +61,22 @@ public class VueControleur extends JFrame {
 
 
     private void chargerLesIcones() {
-        icoRoiBlanc = chargerIcone("Images/wK.png");
-        icoRoiNoir = chargerIcone("Images/bK.png");
-        icoPionBlanc = chargerIcone("Images/wP.png");
-        icoPionNoir = chargerIcone("Images/bP.png");
-        icoReineBlanc = chargerIcone("Images/wQ.png");
-        icoReineNoir = chargerIcone("Images/bQ.png");
-        icoTourBlanc = chargerIcone("Images/wR.png");
-        icoTourNoir = chargerIcone("Images/bR.png");
-        icoCavalierBlanc = chargerIcone("Images/wN.png");
-        icoCavalierNoir = chargerIcone("Images/bN.png");
-        icoFouBlanc = chargerIcone("Images/wB.png");
-        icoFouNoir = chargerIcone("Images/bB.png");
+        icoRoiBlanc = chargerIcone("../Images/wK.png");
+        icoRoiNoir = chargerIcone("../Images/bK.png");
+        icoPionBlanc = chargerIcone("../Images/wP.png");
+        icoPionNoir = chargerIcone("../Images/bP.png");
+        icoReineBlanc = chargerIcone("../Images/wQ.png");
+        icoReineNoir = chargerIcone("../Images/bQ.png");
+        icoTourBlanc = chargerIcone("../Images/wR.png");
+        icoTourNoir = chargerIcone("../Images/bR.png");
+        icoCavalierBlanc = chargerIcone("../Images/wN.png");
+        icoCavalierNoir = chargerIcone("../Images/bN.png");
+        icoFouBlanc = chargerIcone("../Images/wB.png");
+        icoFouNoir = chargerIcone("../Images/bB.png");
     }
 
     private ImageIcon chargerIcone(String urlIcone) {
-        java.net.URL imgURL = getClass().getResource("/" + urlIcone);
+        java.net.URL imgURL = getClass().getResource("/Images/" + urlIcone);
         if (imgURL != null) {
             ImageIcon icon = new ImageIcon(imgURL);
             // Redimensionner l'icône
@@ -87,6 +87,7 @@ public class VueControleur extends JFrame {
             return null;
         }
     }
+    
     
 
     private void placerLesComposantsGraphiques() {
