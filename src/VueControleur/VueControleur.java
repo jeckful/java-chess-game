@@ -182,18 +182,20 @@ public class VueControleur extends JFrame {
     
         JButton zoomPlusButton = new JButton("Zoom +");
         zoomPlusButton.addActionListener(e -> {
-            pxCase += 25; // augmente la taille de la case
-            chargerLesIcones();
-            resizeFenetre();      // adapte la taille de la fenêtre
-            revalidate();         // recalcul de la mise en page (Swing)
-            repaint();            // redessine la fenêtre
-            mettreAJourAffichage();
+            if (pxCase < 170) {
+                pxCase += 30; // augmente la taille de la case
+                chargerLesIcones();
+                resizeFenetre();      // adapte la taille de la fenêtre
+                revalidate();         // recalcul de la mise en page (Swing)
+                repaint();            // redessine la fenêtre
+                mettreAJourAffichage();
+            }
         });
 
         JButton zoomMoinsButton = new JButton("Zoom –");
         zoomMoinsButton.addActionListener(e -> {
-            if (pxCase > 40) { // limite minimale pour éviter de tout casser
-                pxCase -= 25;
+            if (pxCase > 50) { // limite minimale pour éviter de tout casser
+                pxCase -= 30;
                 chargerLesIcones();
                 resizeFenetre();
                 revalidate();
