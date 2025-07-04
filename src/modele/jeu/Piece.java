@@ -11,10 +11,18 @@ public abstract class Piece {
     protected Joueur joueur;
     protected Plateau plateau;
     public String nom;
+    private boolean aBouge = false;
 
-    public Piece(Case position, Joueur joueur) {
+    public void setABouge(boolean aBouge) {
+        this.aBouge = aBouge;
+    }
+    
+
+    public Piece(Case position, Joueur joueur, String nom) {
         this.joueur = joueur;
         this.position = position;
+        this.nom=nom;
+        this.aBouge=false;
         if (position != null) {
             position.setPiece(this);
         }
@@ -37,14 +45,25 @@ public abstract class Piece {
     }
 
     public void allerSurCase(Case nouvelleCase) {
-        if (nouvelleCase != null && (nouvelleCase.getPiece() == null || nouvelleCase.getPiece().getJoueur() != this.joueur)) {
+        ArrayList<Case> deplacementsPossibles = calculerDeplacementsPossibles();
+        if (nouvelleCase != null && deplacementsPossibles.contains(nouvelleCase)) {
             if (position != null) {
                 position.quitterLaCase();
             }
             nouvelleCase.setPiece(this);
             position = nouvelleCase;
+            this.aBouge=true;
         }
     }
+
+    public boolean getABouge() {
+        return this.aBouge;
+    }
+
+    public boolean estCoupValide(Coup coup, Plateau plateau) {
+        return true; // Par défaut, à surcharger
+    }
+    
 
     public boolean appartientA(Joueur joueur) {
         return this.joueur == joueur;
@@ -55,4 +74,11 @@ public abstract class Piece {
     }
 
     public abstract ArrayList<Case> calculerDeplacementsPossibles();
+
+    public Plateau getPlateau() {
+        if (plateau == null && position != null) {
+            plateau = position.getPlateau();
+        }
+        return plateau;
+    }
 }

@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 
 import modele.jeu.Coup;
 import modele.jeu.Jeu;
@@ -42,8 +43,14 @@ public class VueControleur extends JFrame {
     private Case caseClic1; // mémorisation des cases cliquées
     private Case caseClic2;
 
+    private JTextArea historiqueCoups = new JTextArea();
+    private JScrollPane scrollHistorique;
+
+
 
     private JLabel[][] tabJLabel; // cases graphique (au moment du rafraichissement, chaque case va être associée à une icône, suivant ce qui est présent dans le modèle)
+
+    private ArrayList<Case> casesAccessibles = new ArrayList<>();
 
 
     public VueControleur(Jeu _jeu) {
@@ -140,18 +147,32 @@ public class VueControleur extends JFrame {
                         if (caseClic1 == null) {
                             caseClic1 = caseSelectionnee;
                             System.out.println("Première case sélectionnée.");
+                            Piece p = caseClic1.getPiece();
+                            if (p != null && p.getJoueur() == jeu.getJoueurActuel()) {
+                                casesAccessibles = p.calculerDeplacementsPossibles(); // on stocke les déplacements valides
+                                mettreAJourAffichage();
+                            } else {
+                                caseClic1 = null;
+                                casesAccessibles.clear();
+                            }
                         } else {
                             caseClic2 = caseSelectionnee;
                             System.out.println("Deuxième case sélectionnée.");
-                        
+                            
                             Coup coup = new Coup(caseClic1, caseClic2);
-                            jeu.envoyerCoup(coup);  // ✅ c’est la seule vraie modif importante
-                        
-                            mettreAJourAffichage();
+                            jeu.soumettreCoup(coup);
+                            String joueur = jeu.getJoueurActuel().getNom();
+                            String coupTexte = joueur + " : " + caseClic1 + " -> " + caseClic2 + "\n";
+                            historiqueCoups.append(coupTexte);
+
+                            mettreAJourAffichage(); // affiche pendant que les cases sont encore accessibles
+                            casesAccessibles.clear(); // nettoyage après affichage
+                            
                         
                             caseClic1 = null;
                             caseClic2 = null;
-                        }                        
+                        }
+                                              
                     }
                     
                 });
@@ -169,6 +190,17 @@ public class VueControleur extends JFrame {
             }
         }
         add(grilleJLabels);
+        int largeurHistorique = 200;
+        historiqueCoups.setEditable(false);
+        historiqueCoups.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        scrollHistorique = new JScrollPane(historiqueCoups);
+        scrollHistorique.setPreferredSize(new Dimension(largeurHistorique, sizeY * pxCase));
+
+        this.add(scrollHistorique, BorderLayout.EAST); // le met à droite
+
+        this.setSize(sizeX * pxCase + largeurHistorique, sizeY * pxCase + 100);
+
+
     }
 
     private void ajouterBoutons() {
@@ -212,8 +244,10 @@ public class VueControleur extends JFrame {
     }
     
     private void resizeFenetre() {
-        setSize(sizeX * pxCase, sizeY * pxCase + 100); // +100 pour laisser la place aux boutons
+        int largeurHistorique = 200;
+        setSize(sizeX * pxCase + largeurHistorique, sizeY * pxCase + 100);
     }
+    
 
     /**
      * Il y a une grille du côté du modèle ( jeu.getGrille() ) et une grille du côté de la vue (tabJLabel)
@@ -225,6 +259,14 @@ public class VueControleur extends JFrame {
                 Case c = plateau.getCases()[x][y];
     
                 if (c != null) {
+                    Color couleurParDefaut = ((x + y) % 2 == 0) ? new Color(50, 50, 110) : new Color(150, 150, 210);
+                    tabJLabel[x][y].setBackground(couleurParDefaut);
+          
+                    if (casesAccessibles.contains(c)) {
+                        tabJLabel[x][y].setBackground(new Color(60, 160, 60));
+
+                    }
+                    tabJLabel[x][y].repaint();
 
                     Piece e = c.getPiece();
                     //System.out.println("Case (" + x + ", " + y + "): " + e);

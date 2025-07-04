@@ -1,14 +1,23 @@
-bin/
+# === Compiled files ===
 *.class
+*.jar
+*.war
+*.ear
+*.log
+*.out
+*.o
 
+# === Build directories ===
+bin/
+target/
+
+# === IDE config ===
 .vscode/
 .idea/
 *.iml
+*.ipr
+*.iws
 
+# === OS-specific files ===
 .DS_Store
 Thumbs.db
-
-*.log
-
-*.out
-*.o

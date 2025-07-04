@@ -20,26 +20,31 @@ public class Case {
     }
 
     public void setPiece(Piece p) {
+        if (this.p != null && this.p != p) {
+            this.p.setPosition(null);
+        }
+
         this.p = p;
+
         if (p != null) {
             p.setPosition(this);
         }
     }
 
     public void quitterLaCase() {
-        if (this.p != null) {
-            this.p.setPosition(null); // Assurer que la pièce n'a plus de position
-            this.p = null;
-        }
+         if (this.p != null) {
+             this.setPiece(null);
+         }
     }
 
-    // Méthode pour restaurer une pièce dans cette case
     public void restaurerPiece(Piece piece) {
         this.p = piece;
         if (piece != null) {
             piece.setPosition(this);
         }
     }
+
+
     public int getX() {
         return x;
     }
@@ -55,5 +60,26 @@ public class Case {
     public Plateau getPlateau() {
         return plateau;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Case other = (Case) obj;
+        return this.x == other.x && this.y == other.y;
+    }
     
+    @Override
+    public int hashCode() {
+        return 31 * x + y;
+    }
+
+    @Override
+    public String toString() {
+        char colonne = (char) ('a' + x); // 0 → 'a', 1 → 'b', etc.
+        int ligne = 8 - y;               // 0 → 8, 1 → 7, ..., 7 → 1
+        return "" + colonne + ligne;    // Exemple : "e4"
+    }
+        
+        
 }
