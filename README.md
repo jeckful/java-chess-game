@@ -1,4 +1,4 @@
-# ♟️ Java Chess Game – University Project (L3 Computer Science)
+# ♟️ Java Chess Game – University Project
 
 A Java application for playing chess, developed as part of a university Object-Oriented Programming course. The game follows the MVC architecture and uses Swing for the graphical interface.
 
